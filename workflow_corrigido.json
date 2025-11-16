@@ -409,9 +409,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "c50708a1-07e1-490c-b13d-d31440bcb879",
-        "options": {
-          "responseCode": 200
-        }
+        "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
