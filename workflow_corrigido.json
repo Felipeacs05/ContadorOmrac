@@ -1,0 +1,674 @@
+{
+  "name": "[WF1] - Boas Vindas e Verificação",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8f8e5dd-0480-4fec-813d-143f58c25577",
+              "name": "numero_cliente",
+              "value": "={{ $json.from }}",
+              "type": "string"
+            },
+            {
+              "id": "276f2c45-ebe8-4ce3-a463-14ac82401b5f",
+              "name": "pergunta_cliente",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        80
+      ],
+      "id": "a4c15227-dfc7-4e21-a09b-ff0345590522",
+      "name": "Simular Mensagem do WhatsApp"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM clientes WHERE whatsapp_number = '{{ $json.numero_cliente }}';",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -256,
+        80
+      ],
+      "id": "e57ebdd6-6edf-4b8c-9573-effcd3479e69",
+      "name": "Consultar Cliente no DB",
+      "notesInFlow": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "58KFSysyAPsbfRtt",
+          "name": "DB Omrac AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "LtQcVUGlOzG6oLMS",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/LtQcVUGlOzG6oLMS",
+          "cachedResultName": "[WF3] - Cérebro e Interação IA"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "498e0455-24fc-4550-b92f-d93e110a3ccf",
+      "name": "Chamar Cérebro (WF3)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1e53588-d0ff-4c34-839c-b26758fe2047",
+              "name": "dados_do_banco",
+              "value": "={{ $('Consultar Cliente no DB').all() }}",
+              "type": "string"
+            },
+            {
+              "id": "59d938b6-a175-4513-9b19-a7614639b631",
+              "name": "pergunta_cliente",
+              "value": "={{ $('Simular Mensagem do WhatsApp').first().json.pergunta_cliente }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "998909f8-f402-460d-8a2e-fbe52dcb87cb",
+      "name": "Organizar Dados para o Cérebro"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "clientes",
+          "mode": "list",
+          "cachedResultName": "clientes"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "whatsapp_number": "={{ $('Simular Mensagem do WhatsApp').first().json.numero_cliente }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "whatsapp_number",
+              "displayName": "whatsapp_number",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "customer_name",
+              "displayName": "customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "subscription_status",
+              "displayName": "subscription_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        192,
+        176
+      ],
+      "id": "6774b73e-e7a8-450d-b701-73e96d400ea2",
+      "name": "Cadastrar Novo Cliente no DB",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "58KFSysyAPsbfRtt",
+          "name": "DB Omrac AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "97ce09df-dc5d-4c26-8096-353c73c200ce",
+              "leftValue": "={{ $json.whatsapp_number }}",
+              "rightValue": "undefined",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -48,
+        80
+      ],
+      "id": "de66a63b-9fdd-4234-88c9-4cc6547316eb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{'819854947879711'}}",
+        "recipientPhoneNumber": "={{ $('Simular Mensagem do WhatsApp').first().json.numero_cliente }}",
+        "textBody": "={{ `Olá! 👋 Bem-vindo(a) ao *Omrac AI*, seu assistente de IA para controle financeiro inteligente. 🤖💸  \n\nEscolha seu plano:  \n\n1️⃣ *Mensal* — R$ 14,90/mês. Comece agora, sem compromisso.  \n2️⃣ *Semestral* — R$ 55,60 (menos de R$ 10/mês). Economize já no 2º mês.  \n3️⃣ *Anual* — R$ 59,90 (menos de R$ 5/mês). Melhor custo-benefício, suporte o ano todo.  \n\nPor menos que um café por mês ☕, você garante finanças no controle. 💰  \n\nResponda com *1*, *2* ou *3* para gerar seu PIX e começar. 🚀` }}\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        176
+      ],
+      "id": "3e4a21bf-3646-4cb2-803b-4c56d793949e",
+      "name": "Send message",
+      "webhookId": "465277f9-17a0-4318-b6f3-fe18025971dd",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "UqKJ5NtKqDpTcv9e",
+          "name": "WhatsApp Omrac"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "276f2c45-ebe8-4ce3-a463-14ac82401b5f",
+              "name": "resposta_cliente",
+              "value": "3",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        176
+      ],
+      "id": "1bd2318e-05aa-4cc3-a685-06b8940221dc",
+      "name": "Simular resposta"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3e117c08-55da-4044-8863-a864e7b9e0c1"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        576,
+        -16
+      ],
+      "id": "ee0af445-f236-492e-a7ba-e64a8c4155d8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ca5fbe0-9cb3-4a2c-825f-e67138dce4f8",
+              "name": "transaction_amount",
+              "value": "1.1",
+              "type": "string"
+            },
+            {
+              "id": "a7683165-2575-459e-b09c-a099c1373e85",
+              "name": "payment_method_id",
+              "value": "pix",
+              "type": "string"
+            },
+            {
+              "id": "d425f4ba-3c0d-4fa0-9b20-ac22fca16def",
+              "name": "=payer_email",
+              "value": "={{ $('Simular Mensagem do WhatsApp').first().json.numero_cliente }}@omrac.ai",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        176
+      ],
+      "id": "a4e5b276-f093-4a96-a54b-4dec9d18c5e6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.mercadopago.com/v1/payments",
+        "sendQuery": true,
+        "specifyQuery": "json",
+        "jsonQuery": "{\n  \"access_token\": \"APP_USR-5823773873629510-110112-8f02aabb8fd0d8175c10438723993f52-1043503309\"\n}",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"x-idempotency-key\": \"{{ $execution.id }}\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"transaction_amount\": {{ $json.transaction_amount }},\n  \"payment_method_id\": \"{{ $json.payment_method_id }}\",\n  \"payer\": {\n    \"email\": \"{{ $json.payer_email }}\"\n  },\n  \"external_reference\": \"{{ $('Simular Mensagem do WhatsApp').first().json.numero_cliente }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        176
+      ],
+      "id": "c3678b2f-1edd-4c76-af3e-2e6bbe1a39ff",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{'819854947879711'}}",
+        "recipientPhoneNumber": "={{ $('Simular Mensagem do WhatsApp').first().json.numero_cliente }}",
+        "textBody": "=Olá!\n\nSeu pagamento de R$ {{ $json.transaction_amount }} foi gerado.\n\nVocê pode pagar de duas formas:\n\n*1. Acesse o link para pagar com QR Code:*\n{{ $json.point_of_interaction.transaction_data.ticket_url }}\n\n*2. Use o PIX Copia e Cola:*\n{{ $json.point_of_interaction.transaction_data.qr_code }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        176
+      ],
+      "id": "49ebe270-3262-4185-bbfa-a8bc0969535a",
+      "name": "Enviar PIX para Cliente",
+      "webhookId": "465277f9-17a0-4318-b6f3-fe18025971dd",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "UqKJ5NtKqDpTcv9e",
+          "name": "WhatsApp Omrac"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Pega o body\nconst body = $json.body;\n\n// Tenta acessar a mensagem\nconst msg = body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];\n\n// 1. Se não for mensagem, corta o fluxo\nif (!msg) {\n  console.log(\"Ignorando evento que não é mensagem.\");\n  return [];\n}\n\n// 2. Se o tipo NÃO for message (ex: status, delivery, read), corta\nif (msg.type !== \"text\" && msg.type !== \"button\" && msg.type !== \"interactive\") {\n  console.log(\"Ignorando evento que não é mensagem do usuário.\");\n  return [];\n}\n\n// 3. Agora sim: é uma mensagem válida do usuário\nreturn {\n  from: msg.from,\n  text: msg.text?.body || \"\",\n  type: msg.type,\n  id: msg.id\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -784,
+        64
+      ],
+      "id": "a5435209-c855-4309-a48e-67d65fbc3d4e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c50708a1-07e1-490c-b13d-d31440bcb879",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1024,
+        64
+      ],
+      "id": "cc360c32-56e7-4737-922b-5921220e5b2a",
+      "name": "Webhook1",
+      "webhookId": "c50708a1-07e1-490c-b13d-d31440bcb879"
+    },
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "c50708a1-07e1-490c-b13d-d31440bcb879",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1024,
+        -176
+      ],
+      "id": "682aeaab-afc5-4941-93e0-3af1a0524fb1",
+      "name": "Validação",
+      "webhookId": "c50708a1-07e1-490c-b13d-d31440bcb879"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -496,
+        -224
+      ],
+      "id": "0724ce19-240e-43e1-9321-5fc474646594",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "fe666d5d-d491-407b-a3a5-c1dad1debc12",
+              "leftValue": "={{$json[\"query\"][\"hub.verify_token\"]}}",
+              "rightValue": "omrac-ai",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        -176
+      ],
+      "id": "05394ceb-67fc-49ff-acb3-69b4399a1570",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simular Mensagem do WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Consultar Cliente no DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Cliente no DB": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organizar Dados para o Cérebro": {
+      "main": [
+        [
+          {
+            "node": "Chamar Cérebro (WF3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cadastrar Novo Cliente no DB": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Organizar Dados para o Cérebro",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Cadastrar Novo Cliente no DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message": {
+      "main": [
+        [
+          {
+            "node": "Simular resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simular resposta": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Enviar PIX para Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chamar Cérebro (WF3)": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Simular Mensagem do WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validação": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6b83d344-f8c0-4835-9afd-66702c678976",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e826251488a91132e3e73c2137a286180f7920736471c9e41814b73264737f74"
+  },
+  "id": "e0NLpSGbHZtU0bM9",
+  "tags": []
+}
